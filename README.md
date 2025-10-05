@@ -13,11 +13,10 @@ A modern, responsive portfolio website built with React to showcase my work, ski
 
 ## Sections
 
-1. **Hero**: Introduction and call-to-action
-2. **About**: Personal information, skills, and experience
-3. **Projects**: Interactive showcase with iFrame previews
-4. **Contact**: Contact form and social links
-5. **Footer**: Additional links and information
+1. **About**: Personal information, skills, and experience
+2. **Projects**: Interactive showcase with iFrame previews
+3. **Contact**: Contact form and social links
+4. **Footer**: Additional links and information
 
 ## Technologies Used
 
