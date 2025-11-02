@@ -16,6 +16,16 @@ const Projects = () => {
       githubUrl: "https://github.com/ibneal",
       iframeUrl: "https://cultural-lacy-drwishgmi-fda43104.koyeb.app/",
       image: gmiProjectImage
+    },
+    {
+      id: 2,
+      title: "TensorTradeGMI",
+      description: "A sophisticated reinforcement learning system for GMI-based trading on TQQQ/SQQQ. Uses dual-ticker approach with RL agents (PPO, DQN, A2C) to learn optimal entry, exit, pyramiding, and position management strategies. Features backtest optimization, comprehensive performance metrics, and integration with PostgreSQL GMI database and Polygon.io market data.",
+      technologies: ["Python", "Reinforcement Learning", "Stable-Baselines3", "Gymnasium", "PostgreSQL", "Polygon.io API", "PyTorch"],
+      liveUrl: "https://github.com/ibneal/TensorTradeGMI",
+      githubUrl: "https://github.com/ibneal/TensorTradeGMI",
+      iframeUrl: "https://github.com/ibneal/TensorTradeGMI/blob/main/README.md",
+      image: gmiProjectImage
     }
   ];
 
