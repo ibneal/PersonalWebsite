@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Projects.css';
 import gmiProjectImage from '../assets/gmi-project-preview.png';
+import tensorTradeGMIProjectImage from '../assets/dual_ticker_performance.png';
 
 const Projects = () => {
   const [activeProject, setActiveProject] = useState(0);
+  const [readmeContent, setReadmeContent] = useState('');
+  const [readmeLoading, setReadmeLoading] = useState(false);
 
   // Neal's actual projects
   const projects = [
@@ -24,10 +27,121 @@ const Projects = () => {
       technologies: ["Python", "Reinforcement Learning", "Stable-Baselines3", "Gymnasium", "PostgreSQL", "Polygon.io API", "PyTorch"],
       liveUrl: "https://github.com/ibneal/TensorTradeGMI",
       githubUrl: "https://github.com/ibneal/TensorTradeGMI",
-      iframeUrl: "https://github.com/ibneal/TensorTradeGMI/blob/main/README.md",
-      image: gmiProjectImage
+      iframeUrl: "https://cultural-lacy-drwishgmi-fda43104.koyeb.app/",
+      readmePath: "/TensorTradeREADME.md",
+      useMarkdown: true,
+      image: tensorTradeGMIProjectImage
     }
   ];
+
+  // Fetch README when TensorTradeGMI project is selected
+  useEffect(() => {
+    const currentProject = projects[activeProject];
+    if (currentProject?.useMarkdown && currentProject.readmePath) {
+      setReadmeLoading(true);
+      fetch(process.env.PUBLIC_URL + currentProject.readmePath)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch README');
+          }
+          return response.text();
+        })
+        .then(text => {
+          setReadmeContent(text);
+          setReadmeLoading(false);
+        })
+        .catch(error => {
+          console.error('Error fetching README:', error);
+          setReadmeContent('Error loading README. Please click the link above to view on GitHub.');
+          setReadmeLoading(false);
+        });
+    } else {
+      setReadmeContent('');
+    }
+  }, [activeProject]);
+
+  // Simple markdown to HTML converter
+  const renderMarkdown = (text) => {
+    if (!text) return '';
+    
+    let html = text;
+    
+    // Process code blocks first
+    const codeBlocks = [];
+    html = html.replace(/```[\s\S]*?```/g, (match) => {
+      const id = `__CODE_BLOCK_${codeBlocks.length}__`;
+      codeBlocks.push(match);
+      return id;
+    });
+    
+    // Process inline code
+    html = html.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+    
+    // Process headers
+    html = html.replace(/^### (.*?)$/gim, '<h3>$1</h3>');
+    html = html.replace(/^## (.*?)$/gim, '<h2>$1</h2>');
+    html = html.replace(/^# (.*?)$/gim, '<h1>$1</h1>');
+    
+    // Process links
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    
+    // Process bold
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/__(.*?)__/g, '<strong>$1</strong>');
+    
+    // Process italic (simple approach - single asterisk or underscore)
+    html = html.replace(/(^|[^*])\*([^*]+?)\*([^*]|$)/g, '$1<em>$2</em>$3');
+    html = html.replace(/(^|[^_])_([^_]+?)_([^_]|$)/g, '$1<em>$2</em>$3');
+    
+    // Process horizontal rules
+    html = html.replace(/^---$/gim, '<hr>');
+    
+    // Process lists - convert to HTML lists
+    const lines = html.split('\n');
+    let inList = false;
+    let result = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+      let line = lines[i];
+      const trimmed = line.trim();
+      
+      // Check for list items (bullet or numbered)
+      if (trimmed.match(/^[-*] /) || trimmed.match(/^\d+\. /)) {
+        if (!inList) {
+          result.push('<ul>');
+          inList = true;
+        }
+        const content = trimmed.replace(/^[-*] |^\d+\. /, '');
+        result.push(`<li>${content}</li>`);
+      } else {
+        if (inList) {
+          result.push('</ul>');
+          inList = false;
+        }
+        if (trimmed && !trimmed.startsWith('<')) {
+          result.push(`<p>${trimmed}</p>`);
+        } else if (trimmed) {
+          result.push(trimmed);
+        } else if (!trimmed && i < lines.length - 1) {
+          result.push('<br>');
+        }
+      }
+    }
+    
+    if (inList) {
+      result.push('</ul>');
+    }
+    
+    html = result.join('\n');
+    
+    // Restore code blocks
+    codeBlocks.forEach((block, index) => {
+      const code = block.replace(/```[a-z]*\n?/g, '').replace(/```/g, '').trim();
+      html = html.replace(`__CODE_BLOCK_${index}__`, `<pre><code>${code}</code></pre>`);
+    });
+    
+    return html;
+  };
 
   const handleProjectClick = (index) => {
     setActiveProject(index);
@@ -109,13 +223,28 @@ const Projects = () => {
               </div>
             </div>
             <div className="iframe-container">
-              <iframe
-                src={projects[activeProject].iframeUrl}
-                title={projects[activeProject].title}
-                frameBorder="0"
-                allowFullScreen
-                loading="lazy"
-              />
+              {projects[activeProject].useMarkdown ? (
+                <div className="markdown-container">
+                  {readmeLoading ? (
+                    <div className="markdown-loading">
+                      <p>Loading README...</p>
+                    </div>
+                  ) : (
+                    <div 
+                      className="markdown-content"
+                      dangerouslySetInnerHTML={{ __html: renderMarkdown(readmeContent) }}
+                    />
+                  )}
+                </div>
+              ) : (
+                <iframe
+                  src={projects[activeProject].iframeUrl}
+                  title={projects[activeProject].title}
+                  frameBorder="0"
+                  allowFullScreen
+                  loading="lazy"
+                />
+              )}
             </div>
             <div className="preview-info">
               <p>{projects[activeProject].description}</p>
