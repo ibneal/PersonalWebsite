@@ -22,6 +22,16 @@ const Projects = () => {
     },
     {
       id: 2,
+      title: "NealMarket - Backtesting & Auto Charting",
+      description: "A backtesting and auto charting application for analyzing trading strategies. Features automated chart generation, historical strategy backtesting, and interactive visualizations to help evaluate and refine market approaches.",
+      technologies: ["Python", "Backtesting", "Data Visualization", "Charting", "Financial APIs"],
+      liveUrl: "https://nealmarket.site",
+      githubUrl: "https://github.com/ibneal",
+      iframeUrl: "https://nealmarket.site",
+      image: null
+    },
+    {
+      id: 3,
       title: "TensorTradeGMI",
       description: "A sophisticated reinforcement learning system for GMI-based trading on TQQQ/SQQQ. Uses dual-ticker approach with RL agents (PPO, DQN, A2C) to learn optimal entry, exit, pyramiding, and position management strategies. Features backtest optimization, comprehensive performance metrics, and integration with PostgreSQL GMI database and Polygon.io market data.",
       technologies: ["Python", "Reinforcement Learning", "PyTorch", "Polygon.io API"],
@@ -164,7 +174,16 @@ const Projects = () => {
                 onClick={() => handleProjectClick(index)}
               >
                 <div className="project-image">
-                  <img src={project.image} alt={project.title} />
+                  {project.image ? (
+                    <img src={project.image} alt={project.title} />
+                  ) : (
+                    <div className="project-image-placeholder">
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="48" height="48">
+                        <path d="M3 3h18v18H3V3zm16 16V5H5v14h14zm-7-2l-4-5 3-4 3 4 4-3v8H7l5-5z"/>
+                      </svg>
+                      <span>{project.title}</span>
+                    </div>
+                  )}
                   <div className="project-overlay">
                     <div className="project-overlay-content">
                       <h4>{project.title}</h4>
